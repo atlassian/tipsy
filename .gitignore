@@ -1,2 +1,12 @@
 .DS_Store
 pkg
+
+.idea
+.komodotools
+
+*.iml
+*.ipr
+*.iws
+*.komodoproject
+*.sublime-project
+*.sublime-workspace
