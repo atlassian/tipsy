@@ -4,6 +4,7 @@
 // released under the MIT license
 //
 // Modified by Atlassian
+// https://github.com/atlassian/tipsy
 
 (function($) {
     
