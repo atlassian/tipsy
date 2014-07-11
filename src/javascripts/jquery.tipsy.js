@@ -34,6 +34,11 @@
     
     Tipsy.prototype = {
         show: function() {
+            // if element is not in the DOM then don't show the Tipsy and return early
+            if (!isElementInDOM(this.$element[0])) {
+                return;
+            }
+
             var title = this.getTitle();
             if (title && this.enabled) {
                 var $tip = this.tip();
