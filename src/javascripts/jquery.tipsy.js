@@ -219,8 +219,8 @@
         if (!options.live) this.each(function() { get(this); });
         
         if (options.trigger != 'manual') {
-            var eventIn  = options.trigger == 'hover' ? 'mouseenter.tipsy' : 'focus.tipsy',
-                eventOut = options.trigger == 'hover' ? 'mouseleave.tipsy' : 'blur.tipsy';
+            var eventIn  = options.trigger == 'hover' ? 'mouseenter.tipsy focus.tipsy' : 'focus.tipsy',
+                eventOut = options.trigger == 'hover' ? 'mouseleave.tipsy blur.tipsy' : 'blur.tipsy';
             if (options.live) {
                 $(this.context).on(eventIn, this.selector, enter).on(eventOut, this.selector, leave);
             } else {
