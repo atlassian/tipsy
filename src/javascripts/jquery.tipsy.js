@@ -118,6 +118,23 @@
                 }
             }
         },
+
+        // AUI-3830 https://ecosystem.atlassian.net/browse/AUI-3830
+        // We need to be able to remove tipsy from an element
+        destroy: function(){
+          $.removeData(this.$element.get(0));
+
+          this.unbindHandlers();
+          this.hide();
+        },
+
+        unbindHandlers: function() {
+          if(this.options.live){
+            $(this.$element.context).off('.tipsy');
+          } else {
+            this.$element.unbind('.tipsy');
+          }
+        },
         
         hide: function() {
             if (this.options.fade) {
