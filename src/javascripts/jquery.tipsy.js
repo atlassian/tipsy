@@ -120,18 +120,18 @@
         },
 
         destroy: function(){
-          $.removeData(this.$element.get(0));
+            this.$element.removeData('tipsy');
 
-          this.unbindHandlers();
-          this.hide();
+            this.unbindHandlers();
+            this.hide();
         },
 
         unbindHandlers: function() {
-          if(this.options.live){
-            $(this.$element.context).off('.tipsy');
-          } else {
-            this.$element.unbind('.tipsy');
-          }
+            if(this.options.live){
+                $(this.$element.context).off('.tipsy');
+            } else {
+                this.$element.unbind('.tipsy');
+            }
         },
         
         hide: function() {
