@@ -119,8 +119,6 @@
             }
         },
 
-        // AUI-3830 https://ecosystem.atlassian.net/browse/AUI-3830
-        // We need to be able to remove tipsy from an element
         destroy: function(){
           $.removeData(this.$element.get(0));
 
