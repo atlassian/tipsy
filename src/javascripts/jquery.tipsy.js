@@ -118,6 +118,21 @@
                 }
             }
         },
+
+        destroy: function(){
+            this.$element.removeData('tipsy');
+
+            this.unbindHandlers();
+            this.hide();
+        },
+
+        unbindHandlers: function() {
+            if(this.options.live){
+                $(this.$element.context).off('.tipsy');
+            } else {
+                this.$element.unbind('.tipsy');
+            }
+        },
         
         hide: function() {
             if (this.options.fade) {
