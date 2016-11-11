@@ -74,35 +74,51 @@
                     height: this.$element[0].getBoundingClientRect().height
                 });
                 
+                var tipCss = {};
                 var actualWidth = $tip[0].offsetWidth,
-                    actualHeight = $tip[0].offsetHeight,
-                    gravity = maybeCall(this.options.gravity, this.$element[0]);
-                
-                var tp;
-                switch (gravity.charAt(0)) {
-                    case 'n':
-                        tp = {top: pos.top + pos.height + this.options.offset, left: pos.left + pos.width / 2 - actualWidth / 2};
-                        break;
-                    case 's':
-                        tp = {top: pos.top - actualHeight - this.options.offset, left: pos.left + pos.width / 2 - actualWidth / 2};
-                        break;
-                    case 'e':
-                        tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth - this.options.offset};
-                        break;
-                    case 'w':
-                        tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width + this.options.offset};
-                        break;
-                }
-                
-                if (gravity.length == 2) {
-                    if (gravity.charAt(1) == 'w') {
-                        tp.left = pos.left + pos.width / 2 - 15;
+                    actualHeight = $tip[0].offsetHeight;
+                var gravity = maybeCall(this.options.gravity, this.$element[0]);
+
+                if (gravity.length === 2) {
+                    if (gravity.charAt(1) === 'w') {
+                        tipCss.left = pos.left + pos.width / 2 - 15;
                     } else {
-                        tp.left = pos.left + pos.width / 2 - actualWidth + 15;
+                        tipCss.left = pos.left + pos.width / 2 - actualWidth + 15;
                     }
                 }
-                
-                $tip.css(tp).addClass('tipsy-' + gravity);
+
+                switch (gravity.charAt(0)) {
+                    case 'n':
+                        // left could already be set if gravity is 'nw' or 'ne'
+                        if (typeof tipCss.left === 'undefined') {
+                            tipCss.left = pos.left + pos.width / 2 - actualWidth / 2;
+                        }
+                        tipCss.top = pos.top + pos.height + this.options.offset;
+                        break;
+                    case 's':
+                        // left could already be set if gravity is 'sw' or 'se'
+                        if (typeof tipCss.left === 'undefined') {
+                            tipCss.left = pos.left + pos.width / 2 - actualWidth / 2;
+
+                            // We need to apply the left positioning and then recalculate the tooltip height
+                            // If the tooltip is positioned close to the right edge of the window, it could cause
+                            // the tooltip text to overflow and change height.
+                            $tip.css(tipCss);
+                            actualHeight = $tip[0].offsetHeight;
+                        }
+                        tipCss.top = pos.top - actualHeight - this.options.offset;
+                        break;
+                    case 'e':
+                        tipCss.left = pos.left - actualWidth - this.options.offset;
+                        tipCss.top = pos.top + pos.height / 2 - actualHeight / 2;
+                        break;
+                    case 'w':
+                        tipCss.left = pos.left + pos.width + this.options.offset;
+                        tipCss.top = pos.top + pos.height / 2 - actualHeight / 2;
+                        break;
+                }
+
+                $tip.css(tipCss).addClass('tipsy-' + gravity);
                 $tip.find('.tipsy-arrow')[0].className = 'tipsy-arrow tipsy-arrow-' + gravity.charAt(0);
                 
                 if (this.options.fade) {
