@@ -75,7 +75,8 @@
                 });
                 
                 var tipCss = {};
-                var actualWidth = $tip[0].offsetWidth;
+                var actualWidth = $tip[0].offsetWidth,
+                    actualHeight = $tip[0].offsetHeight;
                 var gravity = maybeCall(this.options.gravity, this.$element[0]);
 
                 if (gravity.length === 2) {
@@ -85,8 +86,6 @@
                         tipCss.left = pos.left + pos.width / 2 - actualWidth + 15;
                     }
                 }
-
-                var actualHeight = $tip[0].offsetHeight;
 
                 switch (gravity.charAt(0)) {
                     case 'n':
