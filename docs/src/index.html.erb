@@ -287,12 +287,12 @@ an anchor tag's title attribute.</p>
   </div>
   
   <script type='text/javascript'>
-    $('a.live-tipsy').tipsy({live: true});
+    $(document).tipsy({live: 'a.live-tipsy'});
   </script>
   
   <div class='caption'>Code for live events:</div>
   <div class='code'><pre>&lt;script type=&#x27;text/javascript&#x27;&gt;
-  $(&#x27;a.live-tipsy&#x27;).tipsy({live: true});
+  $(document).tipsy({live: &#x27;a.live-tipsy&#x27;});
 &lt;/script&gt;</pre></div>
   
   <!-- Options -->

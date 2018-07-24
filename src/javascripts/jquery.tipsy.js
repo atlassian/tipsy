@@ -7,7 +7,10 @@
 // https://github.com/atlassian/tipsy
 
 (function($) {
-    
+    var liveBindingWarning = "To be compatible with jQuery 1.9 and higher,"
+    " You must pass a selector to tipsy's live argument." +
+    " For instance, `$(document).tipsy({live: 'a.live'});`";
+
     function maybeCall(thing, ctx) {
         return (typeof thing == 'function') ? (thing.call(ctx)) : thing;
     };
@@ -144,12 +147,12 @@
 
         unbindHandlers: function() {
             if(this.options.live){
-                $(this.$element.context).off('.tipsy');
+                $(document).off('.tipsy', this.options.live);
             } else {
-                this.$element.unbind('.tipsy');
+                this.$element.off('.tipsy');
             }
         },
-        
+
         hide: function() {
             if (this.options.fade) {
                 this.tip().stop().fadeOut(function() { $(this).remove(); });
@@ -216,7 +219,19 @@
         if (options.hoverable) {
             options.delayOut = options.delayOut || 20;
         }
-        
+
+        // Check for jQuery support and patch live binding for jQuery 3 compat.
+        if (options.live === true) {
+            if (!this.selector) {
+                // No more jQuery support!
+                throw new Error(liveBindingWarning);
+            } else {
+                // Deprecated behaviour
+                console && console.warn && console.warn(liveBindingWarning);
+                options.live = this.selector;
+            }
+        }
+
         function get(ele) {
             var tipsy = $.data(ele, 'tipsy');
             if (!tipsy) {
@@ -253,9 +268,13 @@
             var eventIn  = options.trigger == 'hover' ? 'mouseenter.tipsy focus.tipsy' : 'focus.tipsy',
                 eventOut = options.trigger == 'hover' ? 'mouseleave.tipsy blur.tipsy' : 'blur.tipsy';
             if (options.live) {
-                $(this.context).on(eventIn, this.selector, enter).on(eventOut, this.selector, leave);
+                $(document)
+                    .on(eventIn, options.live, enter)
+                    .on(eventOut, options.live, leave)
             } else {
-                this.bind(eventIn, enter).bind(eventOut, leave);
+                this
+                    .on(eventIn, enter)
+                    .on(eventOut, leave)
             }
         }
         
