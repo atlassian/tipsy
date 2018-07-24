@@ -16,10 +16,8 @@
     };
     
     function isElementInDOM(ele) {
-      while (ele = ele.parentNode) {
-        if (ele == document) return true;
-      }
-      return false;
+      var el = ele && ele.jquery ? ele.get(0) : ele;
+      return $.contains(document.documentElement, el);
     };
 
     var tipsyIDcounter = 0;
@@ -38,7 +36,7 @@
     Tipsy.prototype = {
         show: function() {
             // if element is not in the DOM then don't show the Tipsy and return early
-            if (!isElementInDOM(this.$element[0])) {
+            if (!isElementInDOM(this.$element)) {
                 return;
             }
 
@@ -248,17 +246,25 @@
                 tipsy.show();
             } else {
                 tipsy.fixTitle();
-                setTimeout(function() { if (tipsy.hoverState == 'in') tipsy.show(); }, options.delayIn);
+                setTimeout(function() {
+                    if (tipsy.hoverState == 'in' && isElementInDOM(tipsy.$element)) {
+                        tipsy.show();
+                    }
+                }, options.delayIn);
             }
         };
-        
+
         function leave() {
             var tipsy = get(this);
             tipsy.hoverState = 'out';
             if (options.delayOut == 0) {
                 tipsy.hide();
             } else {
-                setTimeout(function() { if (tipsy.hoverState == 'out' && !tipsy.hoverTooltip) tipsy.hide(); }, options.delayOut);
+                setTimeout(function() {
+                    if (tipsy.hoverState == 'out' && !tipsy.hoverTooltip) {
+                        tipsy.hide();
+                    }
+                }, options.delayOut);
             }
         };
         
