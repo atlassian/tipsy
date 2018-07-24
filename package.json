@@ -16,7 +16,7 @@
   "keywords": [
     "tipsy"
   ],
-  "author": "Atlassian",
+  "author": "Jason Frame <jason@onehackoranother.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/atlassian/tipsy/issues"
