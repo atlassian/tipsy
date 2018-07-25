@@ -1,6 +1,6 @@
 {
   "name": "@atlassian/tipsy",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Atlassian fork of tipsy",
   "browser": "src/javascripts/jquery.tipsy.js",
   "main": "src/javascripts/jquery.tipsy.js",
