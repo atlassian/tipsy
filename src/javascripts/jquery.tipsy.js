@@ -1,5 +1,5 @@
 // tipsy, facebook style tooltips for jquery
-// version 1.0.0a
+// version 1.2.0
 // (c) 2008-2010 jason frame [jason@onehackoranother.com]
 // released under the MIT license
 //
