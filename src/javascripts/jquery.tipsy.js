@@ -7,16 +7,17 @@
 // https://github.com/atlassian/tipsy
 
 (function($) {
-    
+    var liveBindingWarning = "To be compatible with jQuery 1.9 and higher,"
+    " You must pass a selector to tipsy's live argument." +
+    " For instance, `$(document).tipsy({live: 'a.live'});`";
+
     function maybeCall(thing, ctx) {
         return (typeof thing == 'function') ? (thing.call(ctx)) : thing;
     };
     
     function isElementInDOM(ele) {
-      while (ele = ele.parentNode) {
-        if (ele == document) return true;
-      }
-      return false;
+      var el = ele && ele.jquery ? ele.get(0) : ele;
+      return $.contains(document.documentElement, el);
     };
 
     var tipsyIDcounter = 0;
@@ -35,7 +36,7 @@
     Tipsy.prototype = {
         show: function() {
             // if element is not in the DOM then don't show the Tipsy and return early
-            if (!isElementInDOM(this.$element[0])) {
+            if (!isElementInDOM(this.$element)) {
                 return;
             }
 
@@ -144,12 +145,12 @@
 
         unbindHandlers: function() {
             if(this.options.live){
-                $(this.$element.context).off('.tipsy');
+                $(document).off('.tipsy', this.options.live);
             } else {
-                this.$element.unbind('.tipsy');
+                this.$element.off('.tipsy');
             }
         },
-        
+
         hide: function() {
             if (this.options.fade) {
                 this.tip().stop().fadeOut(function() { $(this).remove(); });
@@ -216,7 +217,19 @@
         if (options.hoverable) {
             options.delayOut = options.delayOut || 20;
         }
-        
+
+        // Check for jQuery support and patch live binding for jQuery 3 compat.
+        if (options.live === true) {
+            if (!this.selector) {
+                // No more jQuery support!
+                throw new Error(liveBindingWarning);
+            } else {
+                // Deprecated behaviour
+                console && console.warn && console.warn(liveBindingWarning);
+                options.live = this.selector;
+            }
+        }
+
         function get(ele) {
             var tipsy = $.data(ele, 'tipsy');
             if (!tipsy) {
@@ -233,17 +246,25 @@
                 tipsy.show();
             } else {
                 tipsy.fixTitle();
-                setTimeout(function() { if (tipsy.hoverState == 'in') tipsy.show(); }, options.delayIn);
+                setTimeout(function() {
+                    if (tipsy.hoverState == 'in' && isElementInDOM(tipsy.$element)) {
+                        tipsy.show();
+                    }
+                }, options.delayIn);
             }
         };
-        
+
         function leave() {
             var tipsy = get(this);
             tipsy.hoverState = 'out';
             if (options.delayOut == 0) {
                 tipsy.hide();
             } else {
-                setTimeout(function() { if (tipsy.hoverState == 'out' && !tipsy.hoverTooltip) tipsy.hide(); }, options.delayOut);
+                setTimeout(function() {
+                    if (tipsy.hoverState == 'out' && !tipsy.hoverTooltip) {
+                        tipsy.hide();
+                    }
+                }, options.delayOut);
             }
         };
         
@@ -253,9 +274,13 @@
             var eventIn  = options.trigger == 'hover' ? 'mouseenter.tipsy focus.tipsy' : 'focus.tipsy',
                 eventOut = options.trigger == 'hover' ? 'mouseleave.tipsy blur.tipsy' : 'blur.tipsy';
             if (options.live) {
-                $(this.context).on(eventIn, this.selector, enter).on(eventOut, this.selector, leave);
+                $(document)
+                    .on(eventIn, options.live, enter)
+                    .on(eventOut, options.live, leave)
             } else {
-                this.bind(eventIn, enter).bind(eventOut, leave);
+                this
+                    .on(eventIn, enter)
+                    .on(eventOut, leave)
             }
         }
         
