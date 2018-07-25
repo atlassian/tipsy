@@ -325,10 +325,12 @@
             }
         }
 
-        if (!options.live)
-            this.each(function() {
-                get(this);
-            });
+        // create a tipsy object for every selected element,
+        // even when the events are delegated.
+        // this allows destruction to occur.
+        this.each(function() {
+            get(this);
+        });
 
         if (options.trigger != "manual") {
             var eventIn =
