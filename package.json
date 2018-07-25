@@ -2,11 +2,13 @@
   "name": "@atlassian/tipsy",
   "version": "1.2.0",
   "description": "Atlassian fork of tipsy",
+  "browser": "src/javascripts/jquery.tipsy.js",
   "main": "src/javascripts/jquery.tipsy.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
+    "fix": "prettier --write src/**/*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,5 +23,11 @@
   "bugs": {
     "url": "https://github.com/atlassian/tipsy/issues"
   },
-  "homepage": "https://github.com/atlassian/tipsy"
+  "homepage": "https://github.com/atlassian/tipsy",
+  "devDependencies": {
+    "eslint": "^5.2.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-prettier": "^2.6.2",
+    "prettier": "^1.13.7"
+  }
 }
