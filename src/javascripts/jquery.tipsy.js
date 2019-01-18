@@ -56,7 +56,7 @@
                         visibility: "hidden",
                         display: "block"
                     })
-                    .appendTo(parent);
+                    .appendTo($parent);
 
                 var that = this;
                 function tipOver() {
