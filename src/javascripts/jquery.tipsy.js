@@ -40,7 +40,7 @@
                 return;
             }
 
-            var parent = this.options.appendToElement ? this.$element[0] : document.body;
+            var $parent = this.options.appendToElement ? this.$element : document.body;
             var title = this.getTitle();
             if (title && this.enabled) {
                 var $tip = this.tip();
