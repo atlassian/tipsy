@@ -41,6 +41,7 @@
                 return;
             }
 
+            var $parent = this.options.appendToElement ? this.$element : document.body;
             var title = this.getTitle();
             if (title && this.enabled) {
                 var $tip = this.tip();
@@ -56,7 +57,7 @@
                         visibility: "hidden",
                         display: "block"
                     })
-                    .appendTo(document.body);
+                    .appendTo($parent);
 
                 var that = this;
                 function tipOver() {
@@ -84,10 +85,19 @@
                     );
                 }
 
-                var pos = $.extend({}, this.$element.offset(), {
+                var pos = {
                     width: this.$element[0].getBoundingClientRect().width,
                     height: this.$element[0].getBoundingClientRect().height
-                });
+                };
+
+                if (this.options.appendToElement) {
+                    // starting left and top are 0 if appending to element
+                    pos = $.extend({}, pos, {left: 0, top: 0})
+                }
+                else {
+                    // otherwise, calculate the position of the element to show the tooltip in body
+                    pos = $.extend({}, pos, this.$element.offset());
+                }
 
                 var tipCss = {};
                 var actualWidth = $tip[0].offsetWidth,
