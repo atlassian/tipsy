@@ -42,129 +42,131 @@
             }
 
             var title = this.getTitle();
-            if (title && this.enabled) {
-                var $tip = this.tip();
+            if (!title || !this.enabled) {
+                return;
+            }
+            
+            var $tip = this.tip();
 
-                $tip.find(".tipsy-inner")[this.options.html ? "html" : "text"](
-                    title
+            $tip.find(".tipsy-inner")[this.options.html ? "html" : "text"](
+                title
+            );
+            $tip[0].className = "tipsy"; // reset classname in case of dynamic gravity
+            $tip.remove()
+                .css({
+                    top: 0,
+                    left: 0,
+                    visibility: "hidden",
+                    display: "block"
+                })
+                .appendTo(document.body);
+
+            var that = this;
+            function tipOver() {
+                that.hoverTooltip = true;
+            }
+            function tipOut() {
+                if (that.hoverState == "in") return; // If field is still focused.
+                that.hoverTooltip = false;
+                if (that.options.trigger != "manual") {
+                    var eventOut =
+                        that.options.trigger == "hover"
+                            ? "mouseleave.tipsy"
+                            : "blur.tipsy";
+                    that.$element.trigger(eventOut);
+                }
+            }
+
+            if (this.options.hoverable) {
+                $tip.hover(tipOver, tipOut);
+            }
+
+            if (this.options.className) {
+                $tip.addClass(
+                    maybeCall(this.options.className, this.$element[0])
                 );
-                $tip[0].className = "tipsy"; // reset classname in case of dynamic gravity
-                $tip.remove()
-                    .css({
-                        top: 0,
-                        left: 0,
-                        visibility: "hidden",
-                        display: "block"
-                    })
-                    .appendTo(document.body);
+            }
 
-                var that = this;
-                function tipOver() {
-                    that.hoverTooltip = true;
-                }
-                function tipOut() {
-                    if (that.hoverState == "in") return; // If field is still focused.
-                    that.hoverTooltip = false;
-                    if (that.options.trigger != "manual") {
-                        var eventOut =
-                            that.options.trigger == "hover"
-                                ? "mouseleave.tipsy"
-                                : "blur.tipsy";
-                        that.$element.trigger(eventOut);
-                    }
-                }
+            var pos = $.extend({}, this.$element.offset(), {
+                width: this.$element[0].getBoundingClientRect().width,
+                height: this.$element[0].getBoundingClientRect().height
+            });
 
-                if (this.options.hoverable) {
-                    $tip.hover(tipOver, tipOut);
-                }
+            var tipCss = {};
+            var actualWidth = $tip[0].offsetWidth,
+                actualHeight = $tip[0].offsetHeight;
+            var gravity = maybeCall(this.options.gravity, this.$element[0]);
 
-                if (this.options.className) {
-                    $tip.addClass(
-                        maybeCall(this.options.className, this.$element[0])
-                    );
-                }
-
-                var pos = $.extend({}, this.$element.offset(), {
-                    width: this.$element[0].getBoundingClientRect().width,
-                    height: this.$element[0].getBoundingClientRect().height
-                });
-
-                var tipCss = {};
-                var actualWidth = $tip[0].offsetWidth,
-                    actualHeight = $tip[0].offsetHeight;
-                var gravity = maybeCall(this.options.gravity, this.$element[0]);
-
-                if (gravity.length === 2) {
-                    if (gravity.charAt(1) === "w") {
-                        tipCss.left = pos.left + pos.width / 2 - 15;
-                    } else {
-                        tipCss.left =
-                            pos.left + pos.width / 2 - actualWidth + 15;
-                    }
-                }
-
-                switch (gravity.charAt(0)) {
-                    case "n":
-                        // left could already be set if gravity is 'nw' or 'ne'
-                        if (typeof tipCss.left === "undefined") {
-                            tipCss.left =
-                                pos.left + pos.width / 2 - actualWidth / 2;
-                        }
-                        tipCss.top = pos.top + pos.height + this.options.offset;
-                        break;
-                    case "s":
-                        // left could already be set if gravity is 'sw' or 'se'
-                        if (typeof tipCss.left === "undefined") {
-                            tipCss.left =
-                                pos.left + pos.width / 2 - actualWidth / 2;
-
-                            // We need to apply the left positioning and then recalculate the tooltip height
-                            // If the tooltip is positioned close to the right edge of the window, it could cause
-                            // the tooltip text to overflow and change height.
-                            $tip.css(tipCss);
-                            actualHeight = $tip[0].offsetHeight;
-                        }
-                        tipCss.top =
-                            pos.top - actualHeight - this.options.offset;
-                        break;
-                    case "e":
-                        tipCss.left =
-                            pos.left - actualWidth - this.options.offset;
-                        tipCss.top =
-                            pos.top + pos.height / 2 - actualHeight / 2;
-                        break;
-                    case "w":
-                        tipCss.left =
-                            pos.left + pos.width + this.options.offset;
-                        tipCss.top =
-                            pos.top + pos.height / 2 - actualHeight / 2;
-                        break;
-                }
-
-                $tip.css(tipCss).addClass("tipsy-" + gravity);
-                $tip.find(".tipsy-arrow")[0].className =
-                    "tipsy-arrow tipsy-arrow-" + gravity.charAt(0);
-
-                if (this.options.fade) {
-                    $tip.stop()
-                        .css({
-                            opacity: 0,
-                            display: "block",
-                            visibility: "visible"
-                        })
-                        .animate({ opacity: this.options.opacity });
+            if (gravity.length === 2) {
+                if (gravity.charAt(1) === "w") {
+                    tipCss.left = pos.left + pos.width / 2 - 15;
                 } else {
-                    $tip.css({
-                        visibility: "visible",
-                        opacity: this.options.opacity
-                    });
+                    tipCss.left =
+                        pos.left + pos.width / 2 - actualWidth + 15;
                 }
+            }
 
-                if (this.options.aria) {
-                    var $tipID = tipsyID();
-                    $tip.attr("id", $tipID);
-                    this.$element.attr("aria-describedby", $tipID);
-                }
+            switch (gravity.charAt(0)) {
+                case "n":
+                    // left could already be set if gravity is 'nw' or 'ne'
+                    if (typeof tipCss.left === "undefined") {
+                        tipCss.left =
+                            pos.left + pos.width / 2 - actualWidth / 2;
+                    }
+                    tipCss.top = pos.top + pos.height + this.options.offset;
+                    break;
+                case "s":
+                    // left could already be set if gravity is 'sw' or 'se'
+                    if (typeof tipCss.left === "undefined") {
+                        tipCss.left =
+                            pos.left + pos.width / 2 - actualWidth / 2;
+
+                        // We need to apply the left positioning and then recalculate the tooltip height
+                        // If the tooltip is positioned close to the right edge of the window, it could cause
+                        // the tooltip text to overflow and change height.
+                        $tip.css(tipCss);
+                        actualHeight = $tip[0].offsetHeight;
+                    }
+                    tipCss.top =
+                        pos.top - actualHeight - this.options.offset;
+                    break;
+                case "e":
+                    tipCss.left =
+                        pos.left - actualWidth - this.options.offset;
+                    tipCss.top =
+                        pos.top + pos.height / 2 - actualHeight / 2;
+                    break;
+                case "w":
+                    tipCss.left =
+                        pos.left + pos.width + this.options.offset;
+                    tipCss.top =
+                        pos.top + pos.height / 2 - actualHeight / 2;
+                    break;
+            }
+
+            $tip.css(tipCss).addClass("tipsy-" + gravity);
+            $tip.find(".tipsy-arrow")[0].className =
+                "tipsy-arrow tipsy-arrow-" + gravity.charAt(0);
+
+            if (this.options.fade) {
+                $tip.stop()
+                    .css({
+                        opacity: 0,
+                        display: "block",
+                        visibility: "visible"
+                    })
+                    .animate({ opacity: this.options.opacity });
+            } else {
+                $tip.css({
+                    visibility: "visible",
+                    opacity: this.options.opacity
+                });
+            }
+
+            if (this.options.aria) {
+                var $tipID = tipsyID();
+                $tip.attr("id", $tipID);
+                this.$element.attr("aria-describedby", $tipID);
             }
         },
 
